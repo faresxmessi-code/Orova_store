@@ -2,578 +2,563 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Orova | إدارة محلات الملابس</title>
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>أوروفا | إدارة محلات الملابس</title>
   <style>
     :root {
-      --primary: #111827;
-      --accent: #2563eb;
-      --accent-hover: #1d4ed8;
-      --success: #16a34a;
-      --danger: #dc2626;
-      --bg: #f3f4f6;
+      --bg: #f4f6f9;
       --card: #ffffff;
-      --text: #1f2937;
+      --text: #111827;
       --muted: #6b7280;
+      --primary: #1d4ed8;
+      --primary-hover: #1e40af;
+      --danger: #b91c1c;
+      --danger-bg: #fef2f2;
+      --success: #047857;
+      --success-bg: #ecfdf5;
       --border: #e5e7eb;
     }
-    * { box-sizing: border-box; font-family: 'Cairo', sans-serif; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); padding-bottom: 80px; }
-    .container { max-width: 900px; margin: 0 auto; padding: 16px; }
-    
-    /* الهيدر */
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Tahoma, Arial, sans-serif;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 16px;
+      line-height: 1.6;
+    }
+
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
     header {
-      background: var(--primary);
-      color: #fff;
-      padding: 14px 16px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      margin-bottom: 16px;
       display: flex;
+      flex-wrap: wrap;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      gap: 12px;
     }
-    .brand { font-size: 22px; font-weight: 800; letter-spacing: 0.5px; }
-    .brand span { color: #60a5fa; font-size: 13px; font-weight: 600; display: block; margin-top: -4px; }
-    .btn-logout { background: rgba(255,255,255,0.12); color: #fff; border: none; padding: 6px 12px; border-radius: 8px; font-size: 13px; cursor: pointer; }
 
-    /* الكروت والأزرار */
-    .card { background: var(--card); border-radius: 14px; padding: 18px; margin-bottom: 16px; border: 1px solid var(--border); box-shadow: 0 1px 3px rgba(0,0,0,0.04); }
-    h2, h3 { margin-bottom: 12px; font-weight: 700; }
-    label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 5px; color: var(--text); }
+    .brand h1 {
+      font-size: 1.35rem;
+      color: var(--primary);
+    }
+
+    .brand p {
+      font-size: 0.9rem;
+      color: var(--muted);
+    }
+
+    .badge {
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .badge-warn {
+      background: #fffbeb;
+      color: #b45309;
+      border: 1px solid #fde68a;
+    }
+
+    .badge-ok {
+      background: var(--success-bg);
+      color: var(--success);
+      border: 1px solid #a7f3d0;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .card h2 {
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
     input, select {
       width: 100%;
       padding: 11px 12px;
       border: 1px solid var(--border);
       border-radius: 10px;
-      font-size: 15px;
-      margin-bottom: 12px;
-      background: #fafafa;
+      font-size: 0.95rem;
+      background: #fff;
+      color: var(--text);
     }
-    input:focus, select:focus { outline: none; border-color: var(--accent); background: #fff; }
-    .btn {
-      width: 100%;
-      padding: 12px;
+
+    button {
+      background: var(--primary);
+      color: #fff;
       border: none;
       border-radius: 10px;
-      font-size: 15px;
-      font-weight: 700;
+      padding: 11px 16px;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
-      transition: 0.2s;
     }
-    .btn-primary { background: var(--accent); color: #fff; }
-    .btn-primary:hover { background: var(--accent-hover); }
-    .btn-success { background: var(--success); color: #fff; }
-    .btn-danger { background: var(--danger); color: #fff; padding: 6px 10px; font-size: 12px; width: auto; }
-    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text); margin-top: 8px; }
 
-    /* التبويبات السفلية للموبايل */
-    .nav-tabs {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: #fff;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-around;
-      padding: 8px 0;
-      z-index: 50;
+    button:hover {
+      background: var(--primary-hover);
     }
-    .tab-btn {
-      background: none;
-      border: none;
-      font-size: 13px;
-      font-weight: 700;
+
+    button.secondary {
+      background: #e5e7eb;
+      color: var(--text);
+    }
+
+    button.danger {
+      background: var(--danger);
+    }
+
+    .alert {
+      padding: 14px 16px;
+      border-radius: 12px;
+      margin-bottom: 14px;
+      font-size: 0.92rem;
+    }
+
+    .alert-danger {
+      background: var(--danger-bg);
+      color: var(--danger);
+      border: 1px solid #fecaca;
+    }
+
+    .alert-info {
+      background: #eff6ff;
+      color: #1e40af;
+      border: 1px solid #bfdbfe;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .stat-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 14px;
+    }
+
+    .stat-box span {
+      display: block;
+      font-size: 0.85rem;
       color: var(--muted);
-      padding: 6px 12px;
-      cursor: pointer;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 2px;
     }
-    .tab-btn.active { color: var(--accent); }
 
-    /* الجداول والقوائم */
-    .item-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px 0;
+    .stat-box strong {
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.92rem;
+    }
+
+    th, td {
+      padding: 10px;
       border-bottom: 1px solid var(--border);
+      text-align: right;
     }
-    .item-row:last-child { border-bottom: none; }
-    .badge { padding: 3px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
-    .badge-ok { background: #dcfce7; color: #166534; }
-    .badge-low { background: #fee2e2; color: #991b1b; }
 
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .stat-box { background: #fff; padding: 14px; border-radius: 12px; border: 1px solid var(--border); text-align: center; }
-    .stat-num { font-size: 20px; font-weight: 800; color: var(--accent); }
-    .stat-lbl { font-size: 12px; color: var(--muted); }
+    th {
+      background: var(--bg);
+      font-weight: 700;
+    }
 
-    .hidden { display: none !important; }
-    .alert { padding: 12px; border-radius: 10px; margin-bottom: 12px; font-size: 14px; font-weight: 600; }
-    .alert-err { background: #fee2e2; color: #991b1b; }
-    .alert-ok { background: #dcfce7; color: #166534; }
-    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hidden {
+      display: none;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
   </style>
 </head>
 <body>
-
-  <header>
-    <div class="brand">OROVA <span>Store Manager</span></div>
-    <button id="logoutBtn" class="btn-logout hidden" onclick="logout()">خروج</button>
-  </header>
-
   <div class="container">
-    <!-- شاشة التحميل -->
-    <div id="loadingBox" class="card" style="text-align:center; padding:40px;">جاري التحميل...</div>
-
-    <!-- شاشة تسجيل الدخول / إنشاء حساب -->
-    <div id="authBox" class="card hidden">
-      <h2 id="authTitle">تسجيل الدخول إلى أوروفا</h2>
-      <div id="authAlert" class="alert alert-err hidden"></div>
-      
-      <div id="registerFields" class="hidden">
-        <label>اسم المحل</label>
-        <input type="text" id="storeName" placeholder="مثال: ستايل للملابس" />
-        <label>رقم الموبايل / واتساب</label>
-        <input type="tel" id="storePhone" placeholder="01xxxxxxxxx" />
+    <header>
+      <div class="brand">
+        <h1>أوروفا — Orova</h1>
+        <p>نظام إدارة محلات الملابس والمخزون والمبيعات</p>
       </div>
+      <div id="statusBadge" class="badge badge-warn">غير مفعل</div>
+    </header>
 
-      <label>البريد الإلكتروني</label>
-      <input type="email" id="email" placeholder="name@example.com" />
-      <label>كلمة المرور</label>
-      <input type="password" id="password" placeholder="******" />
+    <div id="globalMessage" class="alert alert-info hidden"></div>
 
-      <button class="btn btn-primary" id="authSubmitBtn" onclick="handleAuth()">دخول</button>
-      <button class="btn btn-outline" id="toggleAuthBtn" onclick="toggleAuthMode()">معندكش حساب؟ سجل محلك الآن</button>
-    </div>
+    <!-- شاشة تسجيل / إنشاء حساب محل -->
+    <section id="authSection" class="card">
+      <h2>تسجيل الدخول أو إنشاء حساب محل جديد</h2>
+      <div class="grid-2">
+        <div>
+          <label for="storeNameInput">اسم محل الملابس</label>
+          <input id="storeNameInput" type="text" placeholder="مثال: براند النور للملابس" />
+        </div>
+        <div>
+          <label for="phoneInput">رقم الهاتف / الإدارة</label>
+          <input id="phoneInput" type="tel" placeholder="01xxxxxxxxx" />
+        </div>
+      </div>
+      <div class="row-actions">
+        <button id="registerStoreBtn" type="button">تسجيل المحل والبدء</button>
+        <button id="demoModeBtn" type="button" class="secondary">تجربة محلية بدون قاعدة بيانات</button>
+      </div>
+    </section>
 
-    <!-- شاشة إيقاف الاشتراك (تظهر لو is_active = false) -->
-    <div id="inactiveBox" class="card hidden" style="text-align:center;">
-      <h2 style="color:var(--danger);">حسابك بانتظار التفعيل 🔒</h2>
-      <p style="margin:10px 0; line-height:1.7;">
-        مرحباً بك في <b>أوروفا</b>! لتفعيل حساب محلك (<span id="subStoreName"></span>) والبدء في استخدام الكاشير والمخزون، يرجى تحويل قيمة الاشتراك الشهري (<b>500 ج.م</b>) عبر اتصالات كاش على الرقم:
+    <!-- تنبيه إيقاف الاشتراك -->
+    <section id="inactiveSection" class="card hidden">
+      <div class="alert alert-danger">
+        <strong>تنبيه الاشتراك:</strong> حساب المحل مسجل ولكن حقل <code>is_active</code> في جدول <code>stores_data</code> يساوي <code>false</code> حالياً.
+      </div>
+      <p>
+        لتفعيل لوحة إدارة المحل بالكامل، قيمة الاشتراك الشهري <strong>500 جنيه</strong> على رقم اتصالات كاش:
+        <strong>01156727381</strong>، ثم غيّر <code>is_active</code> إلى <code>true</code> في جدول <code>stores_data</code> داخل Supabase.
       </p>
-      <div style="background:#eff6ff; padding:14px; border-radius:10px; font-size:20px; font-weight:800; color:var(--accent); margin:12px 0;" id="payNumberDisplay"></div>
-      <p style="font-size:13px; color:var(--muted); margin-bottom:16px;">
-        بعد التحويل، ابعت صورة الإيصال على واتساب من رقمك المسجل (<span id="subStorePhone"></span>) وسيتم التفعيل فوراً.
-      </p>
-      <button class="btn btn-primary" onclick="loadStoreData()">تحديث حالة الاشتراك</button>
-    </div>
-
-    <!-- التطبيق الرئيسي -->
-    <div id="appBox" class="hidden">
-      <div style="margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;">
-        <h3 id="headerStoreName" style="margin:0;"></h3>
-        <span class="badge badge-ok">اشتراك نشط ✓</span>
+      <div class="row-actions">
+        <button id="recheckBtn" type="button">إعادة التحقق من التفعيل</button>
+        <button id="logoutBtn1" type="button" class="secondary">تغيير المحل</button>
       </div>
+    </section>
 
-      <!-- تبويب 1: الكاشير (نقطة البيع) -->
-      <div id="tab-pos">
-        <div class="card">
-          <h3>فاتورة بيع جديدة 🧾</h3>
-          <label>اختر القطعة من المخزون</label>
-          <select id="posProductSelect"></select>
-          
-          <div class="grid-2">
-            <div>
-              <label>الكمية</label>
-              <input type="number" id="posQty" value="1" min="1" />
-            </div>
-            <div>
-              <label>خصم (ج.م)</label>
-              <input type="number" id="posDiscount" value="0" min="0" />
-            </div>
+    <!-- لوحة إدارة المحل بعد التفعيل -->
+    <section id="dashboardSection" class="hidden">
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h2 id="activeStoreTitle">لوحة المحل</h2>
+            <p id="activeStoreMeta" style="color:var(--muted); font-size:0.9rem;"></p>
           </div>
-
-          <button class="btn btn-primary" onclick="addToCart()">+ إضافة للفاتورة</button>
+          <button id="logoutBtn2" type="button" class="secondary">خروج</button>
         </div>
 
-        <div class="card">
-          <h3>سلة الفاتورة الحالية</h3>
-          <div id="cartList"><p style="color:var(--muted); font-size:14px;">مفيش أصناف في الفاتورة لسه.</p></div>
-          <hr style="border:none; border-top:1px solid var(--border); margin:12px 0;">
-          <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:800; margin-bottom:12px;">
-            <span>الإجمالي المطلوب:</span>
-            <span id="cartTotal">0 ج.م</span>
-          </div>
-          <button class="btn btn-success" onclick="completeSale()">تأكيد البيع وحفظ الفاتورة ✅</button>
-        </div>
-      </div>
-
-      <!-- تبويب 2: المخزون -->
-      <div id="tab-inventory" class="hidden">
-        <div class="card">
-          <h3>إضافة صنف جديد للمخزون 👕</h3>
-          <label>اسم القطعة</label>
-          <input type="text" id="prodName" placeholder="مثال: تيشيرت أوفر سايز قطن" />
-          <div class="grid-2">
-            <div>
-              <label>المقاس</label>
-              <input type="text" id="prodSize" placeholder="L / XL / 42" />
-            </div>
-            <div>
-              <label>اللون</label>
-              <input type="text" id="prodColor" placeholder="أسود / أبيض" />
-            </div>
-          </div>
-          <div class="grid-2">
-            <div>
-              <label>سعر البيع (ج.م)</label>
-              <input type="number" id="prodPrice" placeholder="350" />
-            </div>
-            <div>
-              <label>الكمية المتاحة</label>
-              <input type="number" id="prodStock" placeholder="10" />
-            </div>
-          </div>
-          <button class="btn btn-primary" onclick="addProduct()">حفظ الصنف في المخزون</button>
-        </div>
-
-        <div class="card">
-          <h3>البضاعة الموجودة في المحل</h3>
-          <div id="inventoryList"></div>
-        </div>
-      </div>
-
-      <!-- تبويب 3: المبيعات والتقارير -->
-      <div id="tab-reports" class="hidden">
-        <div class="stats-grid">
+        <div class="stats" style="margin-top:14px;">
           <div class="stat-box">
-            <div class="stat-num" id="statTotalSales">0 ج.م</div>
-            <div class="stat-lbl">إجمالي المبيعات</div>
+            <span>عدد الأصناف</span>
+            <strong id="statItems">0</strong>
           </div>
           <div class="stat-box">
-            <div class="stat-num" id="statInvoicesCount">0</div>
-            <div class="stat-lbl">عدد الفواتير</div>
+            <span>إجمالي القطع بالمخزون</span>
+            <strong id="statQty">0</strong>
+          </div>
+          <div class="stat-box">
+            <span>إجمالي قيمة المخزون</span>
+            <strong id="statValue">0 ج.م</strong>
           </div>
         </div>
+      </div>
 
-        <div class="card">
-          <h3>سجل الفواتير السابقة</h3>
-          <div id="invoicesList"></div>
+      <div class="card">
+        <h2>إضافة صنف ملابس جديد</h2>
+        <form id="productForm" class="grid-2">
+          <div>
+            <label for="itemName">اسم القطعة / الموديل</label>
+            <input id="itemName" type="text" required placeholder="مثال: هودي قطن أوفرسايز" />
+          </div>
+          <div>
+            <label for="itemSize">المقاس</label>
+            <select id="itemSize">
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L" selected>L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="فري سايز">فري سايز</option>
+            </select>
+          </div>
+          <div>
+            <label for="itemQty">الكمية</label>
+            <input id="itemQty" type="number" min="0" value="1" required />
+          </div>
+          <div>
+            <label for="itemPrice">السعر (ج.م)</label>
+            <input id="itemPrice" type="number" min="0" step="0.5" value="350" required />
+          </div>
+          <div style="grid-column: 1 / -1;">
+            <button type="submit">إضافة إلى المخزون</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <h2>مخزون المحل</h2>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>الصنف</th>
+                <th>المقاس</th>
+                <th>الكمية</th>
+                <th>السعر</th>
+                <th>إجراء</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryBody"></tbody>
+          </table>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 
-  <!-- شريط التنقل السفلي -->
-  <nav id="bottomNav" class="nav-tabs hidden">
-    <button class="tab-btn active" onclick="switchTab('pos', this)">🧾 الكاشير</button>
-    <button class="tab-btn" onclick="switchTab('inventory', this)">👕 المخزون</button>
-    <button class="tab-btn" onclick="switchTab('reports', this)">📊 المبيعات</button>
-  </nav>
-
   <script>
-    // ==========================================
-    // 1. إعدادات الربط ورقم اتصالات كاش الخاص بك
-    // ==========================================
+    // ضع Anon Public Key الخاص بمشروع Supabase هنا لتفعيل المزامنة السحابية
     const SUPABASE_URL = "https://tlthnsprxpuheruvwpex.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_jLWZjB6M1ePI9RJi44-ssQ_Em5O90kI";
-    const ETISALAT_CASH_NUMBER = "01156727381";
+    const SUPABASE_ANON_KEY = "PUT_YOUR_SUPABASE_ANON_KEY_HERE";
 
-    const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const STORAGE_STORE_KEY = "orova_active_store_v1";
+    const STORAGE_ITEMS_KEY = "orova_inventory_v1";
 
-    let isRegisterMode = false;
-    let currentUser = null;
-    let storeData = { store_name: '', phone: '', is_active: true, products: [], invoices: [] };
-    let cart = [];
+    let currentStore = null;
+    let inventory = [];
+    let isLocalOnly = false;
 
-    document.getElementById('payNumberDisplay').innerText = ETISALAT_CASH_NUMBER;
+    const authSection = document.getElementById("authSection");
+    const inactiveSection = document.getElementById("inactiveSection");
+    const dashboardSection = document.getElementById("dashboardSection");
+    const statusBadge = document.getElementById("statusBadge");
+    const globalMessage = document.getElementById("globalMessage");
 
-    // فحص حالة تسجيل الدخول عند فتح الموقع
-    async function init() {
-      const { data: { session } } = await sb.auth.getSession();
-      document.getElementById('loadingBox').classList.add('hidden');
-      if (session) {
-        currentUser = session.user;
-        await loadStoreData();
+    function showMessage(msg, type = "info") {
+      globalMessage.textContent = msg;
+      globalMessage.className = "alert " + (type === "danger" ? "alert-danger" : "alert-info");
+      globalMessage.classList.remove("hidden");
+    }
+
+    function hasSupabaseKey() {
+      return Boolean(SUPABASE_ANON_KEY && !SUPABASE_ANON_KEY.includes("PUT_YOUR_SUPABASE_ANON_KEY_HERE"));
+    }
+
+    async function supabaseRequest(path, options = {}) {
+      const headers = {
+        "apikey": SUPABASE_ANON_KEY,
+        "Authorization": "Bearer " + SUPABASE_ANON_KEY,
+        "Content-Type": "application/json",
+        ...(options.headers || {})
+      };
+      const res = await fetch(SUPABASE_URL + path, { ...options, headers });
+      if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "خطأ في الاتصال بـ Supabase");
+      }
+      if (res.status === 204) return null;
+      return res.json();
+    }
+
+    function setBadge(active) {
+      if (active) {
+        statusBadge.textContent = "مفعل ونشط";
+        statusBadge.className = "badge badge-ok";
       } else {
-        document.getElementById('authBox').classList.remove('hidden');
+        statusBadge.textContent = "بانتظار التفعيل";
+        statusBadge.className = "badge badge-warn";
       }
     }
 
-    function toggleAuthMode() {
-      isRegisterMode = !isRegisterMode;
-      document.getElementById('authTitle').innerText = isRegisterMode ? 'تسجيل محل جديد في أوروفا' : 'تسجيل الدخول إلى أوروفا';
-      document.getElementById('authSubmitBtn').innerText = isRegisterMode ? 'إنشاء الحساب' : 'دخول';
-      document.getElementById('toggleAuthBtn').innerText = isRegisterMode ? 'عندك حساب بالفعل؟ سجل دخول' : 'معندكش حساب؟ سجل محلك الآن';
-      document.getElementById('registerFields').classList.toggle('hidden', !isRegisterMode);
-      document.getElementById('authAlert').classList.add('hidden');
-    }
-
-    async function handleAuth() {
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const alertBox = document.getElementById('authAlert');
-      alertBox.classList.add('hidden');
-
-      if (!email || !password) {
-        alertBox.innerText = 'من فضلك اكتب البريد الإلكتروني وكلمة المرور.';
-        alertBox.classList.remove('hidden');
-        return;
-      }
-
-      if (isRegisterMode) {
-        const storeName = document.getElementById('storeName').value.trim();
-        const storePhone = document.getElementById('storePhone').value.trim();
-        if (!storeName || !storePhone) {
-          alertBox.innerText = 'من فضلك اكتب اسم المحل ورقم الموبايل.';
-          alertBox.classList.remove('hidden');
-          return;
-        }
-
-        const { data, error } = await sb.auth.signUp({ email, password });
-        if (error) {
-          alertBox.innerText = 'خطأ: ' + error.message;
-          alertBox.classList.remove('hidden');
-          return;
-        }
-
-        if (data.user) {
-          currentUser = data.user;
-          await sb.from('stores_data').insert([{
-            user_id: currentUser.id,
-            store_name: storeName,
-            phone: storePhone,
-            is_active: false, // يبدأ غير مفعل حتى يحول الاشتراك أو غيرها لـ true لو حابب فترة تجريبية
-            products: [],
-            invoices: []
-          }]);
-          await loadStoreData();
-        }
+    function saveLocalState() {
+      if (currentStore) {
+        localStorage.setItem(STORAGE_STORE_KEY, JSON.stringify(currentStore));
       } else {
-        const { data, error } = await sb.auth.signInWithPassword({ email, password });
-        if (error) {
-          alertBox.innerText = 'بيانات الدخول غير صحيحة.';
-          alertBox.classList.remove('hidden');
-          return;
-        }
-        currentUser = data.user;
-        await loadStoreData();
+        localStorage.removeItem(STORAGE_STORE_KEY);
       }
+      localStorage.setItem(STORAGE_ITEMS_KEY, JSON.stringify(inventory));
     }
 
-    async function loadStoreData() {
-      document.getElementById('authBox').classList.add('hidden');
-      document.getElementById('logoutBtn').classList.remove('hidden');
+    function renderInventory() {
+      const tbody = document.getElementById("inventoryBody");
+      tbody.innerHTML = "";
 
-      const { data, error } = await sb
-        .from('stores_data')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .single();
+      let totalQty = 0;
+      let totalValue = 0;
 
-      if (data) {
-        storeData = data;
-        if (!storeData.is_active) {
-          document.getElementById('appBox').classList.add('hidden');
-          document.getElementById('bottomNav').classList.add('hidden');
-          document.getElementById('subStoreName').innerText = storeData.store_name;
-          document.getElementById('subStorePhone').innerText = storeData.phone;
-          document.getElementById('inactiveBox').classList.remove('hidden');
-          return;
-        }
+      inventory.forEach((item, idx) => {
+        const qty = Number(item.qty) || 0;
+        const price = Number(item.price) || 0;
+        totalQty += qty;
+        totalValue += qty * price;
 
-        document.getElementById('inactiveBox').classList.add('hidden');
-        document.getElementById('appBox').classList.remove('hidden');
-        document.getElementById('bottomNav').classList.remove('hidden');
-        document.getElementById('headerStoreName').innerText = storeData.store_name;
-        renderAll();
-      }
-    }
-
-    async function saveStoreData() {
-      await sb
-        .from('stores_data')
-        .update({
-          products: storeData.products,
-          invoices: storeData.invoices,
-          updated_at: new Date().toISOString()
-        })
-        .eq('user_id', currentUser.id);
-    }
-
-    async function logout() {
-      await sb.auth.signOut();
-      location.reload();
-    }
-
-    // إدارة المخزون
-    async function addProduct() {
-      const name = document.getElementById('prodName').value.trim();
-      const size = document.getElementById('prodSize').value.trim() || '-';
-      const color = document.getElementById('prodColor').value.trim() || '-';
-      const price = parseFloat(document.getElementById('prodPrice').value);
-      const stock = parseInt(document.getElementById('prodStock').value);
-
-      if (!name || isNaN(price) || isNaN(stock)) {
-        alert('من فضلك أكمل بيانات الصنف والسعر والكمية.');
-        return;
-      }
-
-      storeData.products.push({
-        id: Date.now().toString(),
-        name, size, color, price, stock
-      });
-
-      document.getElementById('prodName').value = '';
-      document.getElementById('prodSize').value = '';
-      document.getElementById('prodColor').value = '';
-      document.getElementById('prodPrice').value = '';
-      document.getElementById('prodStock').value = '';
-
-      renderAll();
-      await saveStoreData();
-      alert('تم إضافة الصنف بنجاح ✅');
-    }
-
-    async function deleteProduct(id) {
-      if (!confirm('متأكد إنك عايز تمسح الصنف ده؟')) return;
-      storeData.products = storeData.products.filter(p => p.id !== id);
-      renderAll();
-      await saveStoreData();
-    }
-
-    // الكاشير والفواتير
-    function addToCart() {
-      const prodId = document.getElementById('posProductSelect').value;
-      const qty = parseInt(document.getElementById('posQty').value) || 1;
-      const discount = parseFloat(document.getElementById('posDiscount').value) || 0;
-
-      const product = storeData.products.find(p => p.id === prodId);
-      if (!product) { alert('اختر صنفاً أولاً'); return; }
-      if (product.stock < qty) { alert('الكمية المتاحة في المخزن أقل من المطلوب!'); return; }
-
-      const lineTotal = Math.max(0, (product.price * qty) - discount);
-      cart.push({
-        prodId: product.id,
-        name: `${product.name} (${product.size} - ${product.color})`,
-        qty,
-        price: product.price,
-        discount,
-        total: lineTotal
-      });
-
-      document.getElementById('posQty').value = 1;
-      document.getElementById('posDiscount').value = 0;
-      renderCart();
-    }
-
-    function removeFromCart(index) {
-      cart.splice(index, 1);
-      renderCart();
-    }
-
-    async function completeSale() {
-      if (cart.length === 0) { alert('الفاتورة فاضية!'); return; }
-
-      let invoiceTotal = 0;
-      cart.forEach(item => {
-        invoiceTotal += item.total;
-        const prod = storeData.products.find(p => p.id === item.prodId);
-        if (prod) prod.stock = Math.max(0, prod.stock - item.qty);
-      });
-
-      storeData.invoices.unshift({
-        id: Math.floor(100000 + Math.random() * 900000),
-        date: new Date().toLocaleString('ar-EG'),
-        items: [...cart],
-        total: invoiceTotal
-      });
-
-      cart = [];
-      renderAll();
-      await saveStoreData();
-      alert('تم تسجيل الفاتورة وخصم الكمية من المخزون ✅');
-    }
-
-    // تحديث الواجهة
-    function renderAll() {
-      // قائمة اختيار الكاشير
-      const select = document.getElementById('posProductSelect');
-      select.innerHTML = storeData.products.length
-        ? storeData.products.map(p => `<option value="${p.id}">${p.name} (${p.size} / ${p.color}) - ${p.price} ج.م [متاح: ${p.stock}]</option>`).join('')
-        : '<option value="">لا توجد أصناف - أضف من المخزون أولاً</option>';
-
-      // قائمة المخزون
-      const invList = document.getElementById('inventoryList');
-      invList.innerHTML = storeData.products.length
-        ? storeData.products.map(p => `
-          <div class="item-row">
-            <div>
-              <b>${p.name}</b> <span style="color:var(--muted); font-size:13px;">(${p.size} - ${p.color})</span><br>
-              <span style="font-size:13px;">السعر: <b>${p.price} ج.م</b></span>
-            </div>
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="badge ${p.stock > 2 ? 'badge-ok' : 'badge-low'}">الكمية: ${p.stock}</span>
-              <button class="btn btn-danger" onclick="deleteProduct('${p.id}')">حذف</button>
-            </div>
-          </div>
-        `).join('')
-        : '<p style="color:var(--muted); font-size:14px;">المخزون فاضي حالياً.</p>';
-
-      // التقارير
-      const totalSales = storeData.invoices.reduce((sum, inv) => sum + inv.total, 0);
-      document.getElementById('statTotalSales').innerText = totalSales + ' ج.م';
-      document.getElementById('statInvoicesCount').innerText = storeData.invoices.length;
-
-      const invoicesList = document.getElementById('invoicesList');
-      invoicesList.innerHTML = storeData.invoices.length
-        ? storeData.invoices.map(inv => `
-          <div class="item-row">
-            <div>
-              <b>فاتورة #${inv.id}</b><br>
-              <span style="font-size:12px; color:var(--muted);">${inv.date} (${inv.items.length} أصناف)</span>
-            </div>
-            <div style="font-weight:800; color:var(--success);">${inv.total} ج.م</div>
-          </div>
-        `).join('')
-        : '<p style="color:var(--muted); font-size:14px;">مفيش فواتير مسجلة لسه.</p>';
-
-      renderCart();
-    }
-
-    function renderCart() {
-      const cartList = document.getElementById('cartList');
-      let total = 0;
-      if (cart.length === 0) {
-        cartList.innerHTML = '<p style="color:var(--muted); font-size:14px;">مفيش أصناف في الفاتورة لسه.</p>';
-        document.getElementById('cartTotal').innerText = '0 ج.م';
-        return;
-      }
-
-      cartList.innerHTML = cart.map((item, idx) => {
-        total += item.total;
-        return `
-          <div class="item-row">
-            <div>
-              <b>${item.name}</b> × ${item.qty}<br>
-              <span style="font-size:12px; color:var(--muted);">الإجمالي: ${item.total} ج.م</span>
-            </div>
-            <button class="btn btn-danger" onclick="removeFromCart(${idx})">إزالة</button>
-          </div>
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${escapeHtml(item.name)}</td>
+          <td>${escapeHtml(item.size)}</td>
+          <td>${qty}</td>
+          <td>${price.toLocaleString("ar-EG")} ج.م</td>
+          <td><button type="button" class="danger" onclick="deleteItem(${idx})">حذف</button></td>
         `;
-      }).join('');
+        tbody.appendChild(tr);
+      });
 
-      document.getElementById('cartTotal').innerText = total + ' ج.م';
+      document.getElementById("statItems").textContent = inventory.length;
+      document.getElementById("statQty").textContent = totalQty;
+      document.getElementById("statValue").textContent = totalValue.toLocaleString("ar-EG") + " ج.م";
+      saveLocalState();
     }
 
-    function switchTab(tabName, btn) {
-      ['pos', 'inventory', 'reports'].forEach(t => document.getElementById('tab-' + t).classList.add('hidden'));
-      document.getElementById('tab-' + tabName).classList.remove('hidden');
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;");
     }
 
-    init();
-  </script>
-</body>
-</html>
+    window.deleteItem = function (index) {
+      inventory.splice(index, 1);
+      renderInventory();
+    };
+
+    async function refreshStoreStatus() {
+      if (!currentStore) {
+        authSection.classList.remove("hidden");
+        inactiveSection.classList.add("hidden");
+        dashboardSection.classList.add("hidden");
+        setBadge(false);
+        return;
+      }
+
+      if (isLocalOnly || !hasSupabaseKey()) {
+        currentStore.is_active = true;
+        setBadge(true);
+        authSection.classList.add("hidden");
+        inactiveSection.classList.add("hidden");
+        dashboardSection.classList.remove("hidden");
+        document.getElementById("activeStoreTitle").textContent = currentStore.store_name;
+        document.getElementById("activeStoreMeta").textContent = "رقم التواصل: " + (currentStore.phone || "غير محدد");
+        renderInventory();
+        return;
+      }
+
+      try {
+        const query = encodeURIComponent(currentStore.store_name);
+        const rows = await supabaseRequest(`/rest/v1/stores_data?store_name=eq.${query}&select=*`);
+        if (Array.isArray(rows) && rows.length > 0) {
+          currentStore = rows[0];
+          saveLocalState();
+        }
+      } catch (err) {
+        showMessage("تعذر تحديث حالة الاشتراك من Supabase: " + err.message, "danger");
+      }
+
+      const active = Boolean(currentStore.is_active);
+      setBadge(active);
+      authSection.classList.add("hidden");
+
+      if (active) {
+        inactiveSection.classList.add("hidden");
+        dashboardSection.classList.remove("hidden");
+        document.getElementById("activeStoreTitle").textContent = currentStore.store_name;
+        document.getElementById("activeStoreMeta").textContent = "رقم التواصل: " + (currentStore.phone || "غير محدد");
+        renderInventory();
+      } else {
+        dashboardSection.classList.add("hidden");
+        inactiveSection.classList.remove("hidden");
+      }
+    }
+
+    document.getElementById("registerStoreBtn").addEventListener("click", async () => {
+      const storeName = document.getElementById("storeNameInput").value.trim();
+      const phone = document.getElementById("phoneInput").value.trim();
+
+      if (!storeName) {
+        showMessage("من فضلك اكتب اسم محل الملابس أولاً.", "danger");
+        return;
+      }
+
+      isLocalOnly = false;
+      currentStore = {
+        store_name: storeName,
+        phone: phone,
+        is_active: false
+      };
+
+      if (hasSupabaseKey()) {
+        try {
+          await supabaseRequest("/rest/v1/stores_data", {
+            method: "POST",
+            headers: { "Prefer": "return=representation" },
+            body: JSON.stringify([{ store_name: storeName, phone: phone, is_active: false }])
+          });
+          showMessage("تم تسجيل المحل في جدول stores_data. فعّل is_active إلى true من Supabase لفتح اللوحة.");
+        } catch (err) {
+          showMessage("تم حفظ المحل محلياً، ولم يتم الحفظ في Supabase: " + err.message, "danger");
+        }
+      } else {
+        showMessage("أضف SUPABASE_ANON_KEY في الكود للمزامنة السحابية، أو استخدم زر التجربة المحلية.", "info");
+      }
+
+      saveLocalState();
+      await refreshStoreStatus();
+    });
+
+    document.getElementById("demoModeBtn").addEventListener("click", async () => {
+      const storeName = document.getElementById("storeNameInput").value.trim() || "محل أوروفا التجريبي";
+      const phone = document.getElementById("phoneInput").value.trim() || "01156727381";
+      isLocalOnly = true;
+      currentStore = { store_name: storeName, phone: phone, is_active: true };
+      saveLocalState();
+      await refreshStoreStatus();
+    });
+
+    document.getElementById("recheckBtn").addEventListener("click", refreshStoreStatus);
+
+    function logout() {
+      currentStore = null;
+      isLocalOnly = false;
+      saveLocalState();
+      refreshStoreStatus();
+    }
+
+    document.getElementById("logoutBtn1").addEventListener("click", logout);
+    document.getElementById("logoutBtn2").addEventListener("click", logout);
+
+    document.getElementById("productForm").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const name = document.getElementById("itemName").value.trim();
+      const size = document.getElementById("itemSize").value;
+      const qty = Number(document.getElementById("itemQty").value);
+      const price = Number(document.getElementById("itemPrice").value);
+
+      if (!name) return;
+
+      inventory.unshift({ name, size, qty, price });
+      e.target.reset();
+      document.getElementById("itemQty
